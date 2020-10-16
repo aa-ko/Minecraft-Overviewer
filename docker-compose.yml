@@ -1,0 +1,19 @@
+version: "3.8"
+services:
+  minecraft-overviewer:
+    image: mc-renderer:latest-dev
+    volumes:
+      - type: bind
+        #source: /wade/docker/minecraft-lfh/world
+        source: ./world
+        target: /world
+        read_only: True
+    tmpfs:
+      - /cache:size=4G
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          cpus: '2.00'
+          memory: 8G
