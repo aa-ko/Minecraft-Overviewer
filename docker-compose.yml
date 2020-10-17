@@ -1,7 +1,7 @@
 version: "3.8"
 services:
   minecraft-overviewer:
-    image: mc-renderer:latest-dev
+    image: minecraft-overviewer-autorender:0.1.0
     volumes:
       - ./world:/world:ro
       - ./render:/render
@@ -14,7 +14,7 @@ services:
         limits:
           cpus: '12.00'
           memory: 8G
-  proxy:
+  reverse-proxy:
     image: caddy:2.1.1-alpine
     depends_on:
       - minecraft-overviewer
