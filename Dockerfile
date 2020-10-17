@@ -32,7 +32,7 @@ COPY docker-requirements.txt /overviewer
 WORKDIR /overviewer
 RUN pip3 install -r docker-requirements.txt
 
-RUN useradd -s /bin/bash mcov
+RUN useradd -m -s /bin/bash mcov
 
 RUN chown -R mcov /overviewer
 RUN chmod -R o+r /overviewer
@@ -41,9 +41,9 @@ RUN chmod -R 744 /cache
 RUN chown -R mcov /render
 RUN chmod -R 744 /render
 
-RUN mkdir -p /home/mcov/.minecraft/versions/${MC_VERSION}/
-RUN wget https://overviewer.org/textures/${MC_VERSION} -O /home/mcov/.minecraft/versions/${MC_VERSION}/${MC_VERSION}.jar
-
 USER mcov
+
+RUN mkdir -p ~/.minecraft/versions/${MC_VERSION}/
+RUN wget https://overviewer.org/textures/${MC_VERSION} -O ~/.minecraft/versions/${MC_VERSION}/${MC_VERSION}.jar
 
 CMD ["python3", "./render.py"]
