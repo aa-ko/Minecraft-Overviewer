@@ -14,7 +14,7 @@ def run_renderer():
         print("Something went wrong when executing renderer.")
     else:
         print("Render seems to be successful. Trying to copy result to mounted target folder.")
-        subprocess.run(["rsync", "-a", "--delete", "/cache/", "/render"])
+        subprocess.run(["rsync", "-qcr", "--delete", "/cache/", "/render"])
 
 print("Running renderer once immediately and then scheduling a run every", render_interval_in_minutes, "minutes..")
 run_renderer()
