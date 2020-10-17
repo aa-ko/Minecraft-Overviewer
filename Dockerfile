@@ -5,7 +5,7 @@ RUN apt-get update
 RUN apt-get -y install wget git build-essential python3 python3-dev python3-pil python3-numpy
 RUN mkdir /overviewer
 WORKDIR /overviewer
-RUN git clone https://github.com/overviewer/Minecraft-Overviewer.git /overviewer
+RUN git clone --branch v0.16.0 --depth 1 https://github.com/overviewer/Minecraft-Overviewer.git /overviewer
 RUN python3 setup.py build
 
 # (Optionally) mount config file
