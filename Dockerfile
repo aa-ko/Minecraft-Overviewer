@@ -1,29 +1,49 @@
 # Build Minecraft-Overviewer from source
-FROM ubuntu:xenial-20200916 AS build
+FROM ubuntu:focal-20200925 AS build
 
 RUN apt-get update
-RUN apt-get -y install git build-essential python3 python3-pil python3-dev python3-numpy
+RUN apt-get -y install wget git build-essential python3 python3-dev python3-pil python3-numpy
 RUN mkdir /overviewer
 WORKDIR /overviewer
 RUN git clone https://github.com/overviewer/Minecraft-Overviewer.git /overviewer
 RUN python3 setup.py build
+
+# (Optionally) mount config file
+#VOLUME /config
+
+# Copy renderer script
+FROM ubuntu:focal-20200925
+
+ENV MC_VERSION=1.16.3
 
 # Mount world directory from host read-only
 VOLUME /world
 # Mount tmpfs for caching render artifacts
 VOLUME /cache
 # Mount target directory (web-server root) from host with write permissions
-#VOLUME /target
-# (Optionally) mount config file
-#VOLUME /config
+VOLUME /render
 
-# Copy renderer script
-FROM python:3.9.0-alpine3.12
+RUN apt-get update
+RUN apt-get -y install wget rsync python3 python3-pip python3-pil python3-numpy
 
-#COPY --from=build /build /overviewer
+COPY --from=build /overviewer /overviewer
 COPY render.py /overviewer
 COPY docker-requirements.txt /overviewer
 WORKDIR /overviewer
-RUN pip install -r docker-requirements.txt
+RUN pip3 install -r docker-requirements.txt
 
-CMD ["python", "./render.py"]
+RUN useradd -s /bin/bash mcov
+
+RUN chown -R mcov /overviewer
+RUN chmod -R o+r /overviewer
+RUN chown -R mcov /cache
+RUN chmod -R 744 /cache
+RUN chown -R mcov /render
+RUN chmod -R 744 /render
+
+RUN mkdir -p /home/mcov/.minecraft/versions/${MC_VERSION}/
+RUN wget https://overviewer.org/textures/${MC_VERSION} -O /home/mcov/.minecraft/versions/${MC_VERSION}/${MC_VERSION}.jar
+
+USER mcov
+
+CMD ["python3", "./render.py"]

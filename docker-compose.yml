@@ -3,17 +3,26 @@ services:
   minecraft-overviewer:
     image: mc-renderer:latest-dev
     volumes:
-      - type: bind
-        #source: /wade/docker/minecraft-lfh/world
-        source: ./world
-        target: /world
-        read_only: True
+      - ./world:/world:ro
+      - ./render:/render
     tmpfs:
-      - /cache:size=4G
+      - /cache:size=4G,uid=1000
     deploy:
       mode: replicated
       replicas: 1
       resources:
         limits:
-          cpus: '2.00'
+          cpus: '12.00'
           memory: 8G
+  proxy:
+    image: caddy:2.1.1-alpine
+    depends_on:
+      - minecraft-overviewer
+    volumes:
+      - ./render:/render:ro
+    entrypoint: ["caddy", "file-server", "--root", "/render", "--listen", ":1234"]
+    ports:
+      - 1234:1234
+    deploy:
+      mode: replicated
+      replicas: 1
