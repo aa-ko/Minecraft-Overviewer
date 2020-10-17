@@ -34,11 +34,11 @@ RUN pip3 install -r docker-requirements.txt
 
 RUN useradd -m -s /bin/bash mcov
 
-RUN chown -R mcov /overviewer
+RUN chown -R mcov:mcov /overviewer
 RUN chmod -R o+r /overviewer
-RUN chown -R mcov /cache
+RUN chown -R mcov:mcov /cache
 RUN chmod -R 744 /cache
-RUN chown -R mcov /render
+RUN chown -R mcov:mcov /render
 RUN chmod -R 744 /render
 
 USER mcov
